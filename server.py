@@ -63,6 +63,8 @@ def create_toot(
     content: str,
     visibility: str = "public",
     spoiler_text: str = "",
+    media_ids: str = "",
+    in_reply_to_id: str = "",
 ) -> str:
     """Create a new toot (status post).
 
@@ -70,13 +72,23 @@ def create_toot(
         content: The text of the toot (up to 500 characters on most instances).
         visibility: One of 'public', 'unlisted', 'private', 'direct'.
         spoiler_text: Optional content warning / subject line.
+        media_ids: Comma-separated media IDs (from upload_media) to attach to
+                   the toot. Most instances allow up to 4 images per toot.
+        in_reply_to_id: Optional ID of an existing toot to reply to. Pass the
+                        previous toot's id to chain posts into a thread.
     """
     try:
-        status = _client.status_post(
-            content,
-            visibility=visibility,
-            spoiler_text=spoiler_text or None,
-        )
+        kwargs = {
+            "visibility": visibility,
+            "spoiler_text": spoiler_text or None,
+        }
+        if media_ids.strip():
+            kwargs["media_ids"] = [
+                int(mid.strip()) for mid in media_ids.split(",") if mid.strip()
+            ]
+        if in_reply_to_id.strip():
+            kwargs["in_reply_to_id"] = int(in_reply_to_id.strip())
+        status = _client.status_post(content, **kwargs)
         return json.dumps(_status_to_dict(status), indent=2)
     except MastodonError as e:
         return json.dumps({"error": str(e)})

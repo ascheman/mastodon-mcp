@@ -8,13 +8,21 @@ create, edit, read, and delete Mastodon toots via the
 
 | Tool | Description |
 |---|---|
-| `create_toot` | Post a new toot (content, visibility, spoiler text) |
+| `create_toot` | Post a new toot (content, visibility, spoiler, images, thread reply) |
+| `upload_media` | Upload an image and return its media ID (for `create_toot`) |
 | `edit_toot` | Edit an existing toot by ID |
 | `delete_toot` | Delete a toot by ID |
 | `get_toot` | Fetch a single toot by ID |
 | `get_timeline` | Fetch the home timeline |
 | `search` | Search toots, accounts, or hashtags |
 | `get_notifications` | Fetch recent notifications |
+
+### Images and threads
+
+To attach images, first `upload_media` each file (with its alt text) to get
+a media ID, then pass the IDs to `create_toot` via `media_ids`
+(comma-separated, up to **4 images** per toot). To build a thread, pass the
+previous toot's `id` as `in_reply_to_id` on the next `create_toot` call.
 
 ## Setup
 
